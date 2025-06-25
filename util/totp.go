@@ -5,7 +5,7 @@ import (
 	"encoding/base64"
 	"image/png"
 
-	"github.com/pquerna/otp"
+	//	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
 )
 

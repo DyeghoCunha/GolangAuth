@@ -1,19 +1,27 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
+	"os"
 
-	"github.com/dyeghocunha/golang-auth/util"
+	"github.com/dyeghocunha/golang-auth/db"
+	"github.com/dyeghocunha/golang-auth/routes"
 )
 
 func main() {
-	util.SendTestEmail() // dispara ao subir
 
-	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "Auth service está online!")
-	})
+	err := db.Connect()
+	if err != nil {
+		log.Fatal("❌ Erro ao conectar no banco:", err)
+	}
+	routes.HealthCheckHandler()
+	routes.SetupRoutes()
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080" // Default port if not set
+	}
+	log.Println("🚀 Servidor rodando na porta:", port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 
-	fmt.Println("🚀 Servidor rodando na porta 8080...")
-	http.ListenAndServe(":8080", nil)
 }
