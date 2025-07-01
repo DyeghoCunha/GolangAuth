@@ -36,3 +36,14 @@ func GenerateTOTPKey(issuer, account string) (string, string, error) {
 func ValidateTOTPCode(secret, code string) bool {
 	return totp.Validate(code, secret)
 }
+
+func Generate2FASecret(email string) (string, error) {
+	secret, err := totp.Generate(totp.GenerateOpts{
+		Issuer:      "GolangAuth",
+		AccountName: email,
+	})
+	if err != nil {
+		return "", err
+	}
+	return secret.Secret(), nil
+}
