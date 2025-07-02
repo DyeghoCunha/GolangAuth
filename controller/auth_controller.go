@@ -7,7 +7,6 @@ import (
 	"github.com/dyeghocunha/golang-auth/util"
 	"github.com/pquerna/otp"
 	"github.com/skip2/go-qrcode"
-	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
 )
@@ -17,6 +16,53 @@ type RegisterRequest struct {
 	Password string `json:"password"`
 }
 
+func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	var req LoginRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request", http.StatusBadRequest)
+		return
+	}
+	user, err := repository.GetUserByEmail(req.Email)
+
+	if err != nil {
+		http.Error(w, "User not found", http.StatusUnauthorized)
+		return
+	}
+	if !util.CheckPasswordHash(user.PasswordHash, req.Password) {
+		http.Error(w, "Hash and Password doesen´t match", http.StatusUnauthorized)
+		return
+	}
+
+	if user.IsTwoFAEnabled {
+		partialToken, err := util.GeneratePartialJWT(user.Email)
+		if err != nil {
+			http.Error(w, "Error generating partial token: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+		json.NewEncoder(w).Encode(map[string]string{
+			"partial_token": partialToken,
+			"message":       "2FA required, please verify your code",
+		})
+		return
+		accessToken, err := util.GenerateJWT(user.Email)
+		if err != nil {
+			http.Error(w, "Erro ao gerar access token", http.StatusInternalServerError)
+			return
+		}
+
+		refreshToken, err := util.GenerateRefreshToken(user.Email)
+		if err != nil {
+			http.Error(w, "Erro ao gerar refresh token", http.StatusInternalServerError)
+			return
+		}
+
+		json.NewEncoder(w).Encode(map[string]string{
+			"access_token":  accessToken,
+			"refresh_token": refreshToken,
+		})
+	}
+
+}
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	var req RegisterRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
@@ -25,13 +71,14 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	password := req.Password
-	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	//hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	hash, err := util.HashPassword(password)
 	if err != nil {
 		http.Error(w, "Erro ao criar hash da senha", http.StatusInternalServerError)
 		return
 	}
 
-	err = repository.CreateUser(req.Email, string(hash))
+	err = repository.CreateUser(req.Email, hash)
 	if err != nil {
 		log.Println("Error creating user:", err)
 		http.Error(w, "Error creating user"+err.Error(), http.StatusInternalServerError)

@@ -1,6 +1,8 @@
 package util
 
 import (
+	"fmt"
+	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/smtp"
 	"os"
@@ -28,4 +30,10 @@ func SendTestEmail() {
 	} else {
 		log.Println("✅ Email enviado com sucesso!")
 	}
+}
+
+func CheckPasswordHash(hash, password string) bool {
+	fmt.Println(hash)
+	fmt.Println(password)
+	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)) == nil
 }

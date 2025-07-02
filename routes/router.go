@@ -14,6 +14,7 @@ func SetupRoutes() {
 	//http.HandleFunc("/verify-2fa", controller.Verify2FAHandler)
 
 	http.HandleFunc("/generate-qr", controller.GenerateQRCodeHandler)
+	http.HandleFunc("/login", controller.LoginHandler)
 
 	http.Handle("/minha-rota", middleware.JWTAuthMiddleware(http.HandlerFunc(controller.ProfileHandler)))
 	http.Handle("/rota-segura", middleware.JWTAuthMiddlewareWith2FA(http.HandlerFunc(controller.SensitiveHandler)))

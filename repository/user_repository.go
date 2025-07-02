@@ -7,11 +7,11 @@ import (
 )
 
 func GetUserByEmail(email string) (*model.User, error) {
-	query := `SELECT id, email, two_fa_secret, is_two_fa_enabled, created_at, updated_at FROM users WHERE email = $1 LIMIT 1`
+	query := `SELECT id, email, two_fa_secret, is_two_fa_enabled, created_at, updated_at,password_hash FROM users WHERE email = $1 LIMIT 1`
 	row := db.Conn.QueryRow(context.Background(), query, email)
 
 	var u model.User
-	err := row.Scan(&u.ID, &u.Email, &u.TwoFASecret, &u.IsTwoFAEnabled, &u.CreatedAt, &u.UpdatedAt)
+	err := row.Scan(&u.ID, &u.Email, &u.TwoFASecret, &u.IsTwoFAEnabled, &u.CreatedAt, &u.UpdatedAt, &u.PasswordHash)
 	if err != nil {
 		return nil, err
 	}

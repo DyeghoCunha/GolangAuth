@@ -3,6 +3,7 @@ package util
 import (
 	"bytes"
 	"encoding/base64"
+	"golang.org/x/crypto/bcrypt"
 	"image/png"
 
 	//	"github.com/pquerna/otp"
@@ -46,4 +47,8 @@ func Generate2FASecret(email string) (string, error) {
 		return "", err
 	}
 	return secret.Secret(), nil
+}
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	return string(bytes), err
 }
