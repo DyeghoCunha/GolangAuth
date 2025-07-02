@@ -41,3 +41,9 @@ func DeleteUser(id int) error {
 	_, err := db.Conn.Exec(context.Background(), query, id)
 	return err
 }
+
+func Enable2Fa(email string) error {
+	query := `UPDATE users SET is_two_fa_enabled = true WHERE email = $1`
+	_, err := db.Conn.Exec(context.Background(), query, email)
+	return err
+}
