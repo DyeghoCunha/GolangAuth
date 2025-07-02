@@ -18,9 +18,9 @@ func GetUserByEmail(email string) (*model.User, error) {
 	return &u, nil
 }
 
-func CreateUser(email string) error {
-	query := `INSERT INTO users (email,created_at,updated_at) VALUES ($1, CURRENT_DATE, CURRENT_DATE)`
-	_, err := db.Conn.Exec(context.Background(), query, email)
+func CreateUser(email, passwordHash string) error {
+	query := `INSERT INTO users (email, password_hash, created_at, updated_at) VALUES ($1, $2, CURRENT_DATE, CURRENT_DATE)`
+	_, err := db.Conn.Exec(context.Background(), query, email, passwordHash)
 	return err
 }
 

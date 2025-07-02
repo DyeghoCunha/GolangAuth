@@ -3,6 +3,7 @@ package model
 type User struct {
 	ID             int    `json:"id"`
 	Email          string `json:"email"`
+	PasswordHash   string `json:"-"`
 	TwoFASecret    string `json:"two_fa_secret"`
 	IsTwoFAEnabled bool   `json:"is_two_fa_enabled"`
 	CreatedAt      string `json:"created_at"`

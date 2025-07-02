@@ -7,12 +7,14 @@ import (
 	"github.com/dyeghocunha/golang-auth/util"
 	"github.com/pquerna/otp"
 	"github.com/skip2/go-qrcode"
+	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
 )
 
 type RegisterRequest struct {
-	Email string `json:"email"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
@@ -22,7 +24,14 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid E-mail", http.StatusBadRequest)
 		return
 	}
-	err = repository.CreateUser(req.Email)
+	password := req.Password
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		http.Error(w, "Erro ao criar hash da senha", http.StatusInternalServerError)
+		return
+	}
+
+	err = repository.CreateUser(req.Email, string(hash))
 	if err != nil {
 		log.Println("Error creating user:", err)
 		http.Error(w, "Error creating user"+err.Error(), http.StatusInternalServerError)
