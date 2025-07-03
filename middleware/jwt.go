@@ -4,14 +4,16 @@ import (
 	"context"
 	"github.com/dyeghocunha/golang-auth/repository"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtSecret = []byte("algosecreto")
+var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
 
 func JWTAuthMiddleware(next http.Handler) http.Handler {
+
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {

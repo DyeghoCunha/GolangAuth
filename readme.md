@@ -98,7 +98,94 @@ $ docker-compose up --build
 
 ## ✅ TODO (Próximas Etapas)
 
-*
+Perfeito, O Grande Autista Majestoso 🧠✨
+Com base nos endpoints da função `SetupRoutes()`, aqui está a documentação objetiva e organizada **por ordem de execução lógica no fluxo da aplicação**:
+
+---
+
+## 📘 **Documentação de Endpoints da Autenticação**
+
+### 🔹 1. **Registrar Usuário**
+
+* **POST `/register`**
+* Cria um novo usuário com email e senha.
+* ⚠️ Senha será automaticamente convertida em hash e salva.
+
+---
+
+### 🔹 2. **Login (sem ou com 2FA)**
+
+* **POST `/login`**
+* Verifica email e senha:
+
+    * Se `is_two_fa_enabled = false`: gera access e refresh token direto.
+    * Se `is_two_fa_enabled = true`: retorna `partial_token` e exige verificação TOTP.
+
+---
+
+### 🔹 3. **Ativar 2FA (autenticado)**
+
+* **POST `/enable-2fa`**
+* Gera secret TOTP para o usuário e ativa o campo `is_two_fa_enabled`.
+* ⚠️ Requer `Authorization: Bearer access_token`
+
+---
+
+### 🔹 4. **Gerar QR Code do 2FA**
+
+* **GET `/generate-qr`**
+* Gera a imagem do QR Code para o usuário escanear no Google Authenticator.
+* ⚠️ Internamente usa o segredo do 2FA já salvo.
+
+---
+
+### 🔹 5. **Verificar código do 2FA (com partial token)**
+
+* **POST `/verify-2fa`**
+* Recebe código TOTP + partial\_token.
+* Se o código estiver correto, gera access e refresh tokens completos.
+
+---
+
+### 🔹 6. **Consultar dados do usuário logado**
+
+* **GET `/profile`**
+* Retorna dados básicos do usuário autenticado.
+* ⚠️ Requer access token.
+
+---
+
+### 🔹 7. **Rota normal protegida**
+
+* **GET `/normal-route`**
+* Exemplo de rota que exige token JWT válido.
+
+---
+
+### 🔹 8. **Rota sensível (exige 2FA)**
+
+* **GET `/sensitive-data`**
+* Só acessível por usuários com 2FA verificado via middleware.
+
+---
+
+### 🔹 9. **Buscar todos os usuários**
+
+* **GET `/user`**
+* Lista de usuários cadastrados (pode ser restrita no futuro).
+
+---
+
+### 🔹 10. **Health Check**
+
+* **GET `/health`**
+* Apenas para checar se a API está online.
+
+---
+
+Se quiser, posso formatar isso num `README.md` pronto para commit também.
+Posso seguir com a documentação dos controllers e models se desejar 🧩
+
 
 ---
 

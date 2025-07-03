@@ -24,5 +24,6 @@ func main() {
 	}
 	log.Println("🚀 Servidor rodando na porta:", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Println("JWT_SECRET carregado:", os.Getenv("JWT_SECRET"))
 
 }
